@@ -15,12 +15,17 @@ pipeline {
         stage('Set up Python Environment') {
             steps {
                 script {
-                    // Windows uses a different path for virtual environment and pip
-                    def pythonBin = isUnix() ? './$VENV_DIR/bin' : '.\\$VENV_DIR\\Scripts'
-                    // Use bat for Windows commands
-                    bat 'python -m venv $VENV_DIR'
-                    bat '.\\$VENV_DIR\\Scripts\\pip install --upgrade pip'
-                    bat '.\\$VENV_DIR\\Scripts\\pip install -r requirements.txt'
+                    // Define the virtual environment binary location for Windows
+                    def pythonBin = isUnix() ? "./${VENV_DIR}/bin" : ".\\${VENV_DIR}\\Scripts"
+                    
+                    // Create the virtual environment
+                    bat "python -m venv ${VENV_DIR}"
+                    
+                    // Upgrade pip in the virtual environment
+                    bat ".\\${VENV_DIR}\\Scripts\\pip install --upgrade pip"
+                    
+                    // Install dependencies from requirements.txt
+                    bat ".\\${VENV_DIR}\\Scripts\\pip install -r requirements.txt"
                 }
             }
         }
@@ -28,14 +33,14 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo 'No tests defined yet. Add pytest or other test runner here.'
-                // Example: bat '.\\$VENV_DIR\\Scripts\\pytest tests'
+                // Example: bat '.\\${VENV_DIR}\\Scripts\\pytest tests'
             }
         }
 
         stage('Run Streamlit App (optional deploy step)') {
             steps {
                 echo 'Deployment logic here if needed (Heroku, EC2, etc.)'
-                // Example: bat '.\\$VENV_DIR\\Scripts\\streamlit run app.py'
+                // Example: bat '.\\${VENV_DIR}\\Scripts\\streamlit run app.py'
             }
         }
     }
