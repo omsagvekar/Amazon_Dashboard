@@ -15,15 +15,15 @@ pipeline {
         stage('Set up Python Environment') {
             steps {
                 script {
+                    def pythonBin = ".\\${VENV_DIR}\\Scripts"
+
                     bat 'python --version'
                     bat 'pip --version'
 
-                    def pythonBin = ".\\${VENV_DIR}\\Scripts"
-
                     bat "python -m venv ${VENV_DIR}"
-                    bat "dir ${pythonBin}"  // Confirm venv created
+                    bat "dir ${pythonBin}"  // Debugging: confirm venv created
+
                     bat "${pythonBin}\\python.exe -m pip install --upgrade pip"
-                    bat "${pythonBin}\\python.exe -m pip --version"
                     bat "${pythonBin}\\python.exe -m pip install -r requirements.txt"
                 }
             }
@@ -34,8 +34,8 @@ pipeline {
                 script {
                     def pythonBin = ".\\${VENV_DIR}\\Scripts"
 
-                    // Run pytest and generate test report
-                    bat "${pythonBin}\\pytest tests --junitxml=pytest-report.xml"
+                    // ✅ Run pytest using python -m to ensure it works in all environments
+                    bat "${pythonBin}\\python.exe -m pytest tests --junitxml=pytest-report.xml"
                 }
             }
         }
@@ -43,14 +43,14 @@ pipeline {
         stage('Run Streamlit App (optional deploy step)') {
             steps {
                 echo 'Deployment logic here if needed (Heroku, EC2, etc.)'
-                // Example: bat '.\\${VENV_DIR}\\Scripts\\streamlit run app.py'
+                // Example: bat '.\\venv\\Scripts\\streamlit run app.py'
             }
         }
     }
 
     post {
         always {
-            // Publish test results even if tests fail
+            // ✅ Publish test results to Jenkins UI
             junit 'pytest-report.xml'
         }
         failure {
