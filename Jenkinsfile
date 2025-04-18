@@ -9,7 +9,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone your repository
-                git 'https://github.com/Chinmayee21d/Amazon_Dashboard.git'
+                git 'https://github.com/omsagvekar/Amazon_Dashboard.git'
             }
         }
 
