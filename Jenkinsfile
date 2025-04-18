@@ -16,10 +16,12 @@ pipeline {
             }
         }
 
-        stage('Build Docker') {
+        stage('Build Docker Image') {
             steps {
-                // bat 'docker-compose down'
-                bat 'docker-compose up --build -d'
+                script {
+                    // Build the Docker image
+                    sh 'docker build -t ${DOCKER_IMAGE} .'
+                }
             }
         }
 
