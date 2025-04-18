@@ -17,12 +17,17 @@ pipeline {
                 script {
                     def pythonBin = ".\\${VENV_DIR}\\Scripts"
 
+                    // Check python and pip versions
                     bat 'python --version'
                     bat 'pip --version'
 
+                    // Create virtual environment
                     bat "python -m venv ${VENV_DIR}"
+
+                    // Verify venv creation
                     bat "dir ${pythonBin}"  // Debugging: confirm venv created
 
+                    // Upgrade pip and install requirements in one line
                     bat "${pythonBin}\\python.exe -m pip install --upgrade pip"
                     bat "${pythonBin}\\python.exe -m pip install -r requirements.txt"
                 }
@@ -34,7 +39,7 @@ pipeline {
                 script {
                     def pythonBin = ".\\${VENV_DIR}\\Scripts"
 
-                    // ✅ Run pytest using python -m to ensure it works in all environments
+                    // Run pytest using python -m to ensure it works in all environments
                     bat "${pythonBin}\\python.exe -m pytest tests --junitxml=pytest-report.xml"
                 }
             }
@@ -50,7 +55,7 @@ pipeline {
 
     post {
         always {
-            // ✅ Publish test results to Jenkins UI
+            // Publish test results to Jenkins UI
             junit 'pytest-report.xml'
         }
         failure {
