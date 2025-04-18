@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        git 'DefaultGit' // name you gave in Jenkins tool config
+    }
+
     environment {
         DOCKER_IMAGE = "amazon-sales-dashboard"
     }
@@ -12,12 +16,10 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Docker') {
             steps {
-                script {
-                    // Build the Docker image
-                    sh 'docker build -t ${DOCKER_IMAGE} .'
-                }
+                // bat 'docker-compose down'
+                bat 'docker-compose up --build -d'
             }
         }
 
