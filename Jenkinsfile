@@ -15,17 +15,27 @@ pipeline {
         stage('Set up Python Environment') {
             steps {
                 script {
+                    // Debugging step to check environment
+                    bat 'python --version'
+                    bat 'pip --version'
+
                     // Define the virtual environment binary location for Windows
                     def pythonBin = isUnix() ? "./${VENV_DIR}/bin" : ".\\${VENV_DIR}\\Scripts"
-                    
+
                     // Create the virtual environment
                     bat "python -m venv ${VENV_DIR}"
-                    
-                    // Upgrade pip in the virtual environment
-                    bat ".\\${VENV_DIR}\\Scripts\\pip install --upgrade pip"
-                    
-                    // Install dependencies from requirements.txt
-                    bat ".\\${VENV_DIR}\\Scripts\\pip install -r requirements.txt"
+
+                    // Check if venv creation was successful
+                    bat "dir .\\${VENV_DIR}\\Scripts"  // List files in the Scripts folder to check if virtualenv created
+
+                    // Upgrade pip using the virtual environment's Python executable
+                    bat ".\\${VENV_DIR}\\Scripts\\python.exe -m pip install --upgrade pip"
+
+                    // Check pip version after upgrade
+                    bat ".\\${VENV_DIR}\\Scripts\\python.exe -m pip --version"
+
+                    // Install dependencies from requirements.txt using the virtual environment's pip
+                    bat ".\\${VENV_DIR}\\Scripts\\python.exe -m pip install -r requirements.txt"
                 }
             }
         }
