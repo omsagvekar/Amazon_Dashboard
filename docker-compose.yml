@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8501:8501"  # Expose port 8501 on the host and container
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    environment:
+      - PYTHONUNBUFFERED=1  # Ensure logs are displayed in real-time
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

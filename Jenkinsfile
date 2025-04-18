@@ -2,67 +2,56 @@ pipeline {
     agent any
 
     environment {
-        VENV_DIR = 'venv'
+        DOCKER_IMAGE = "amazon-sales-dashboard"
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/Chinmayee21d/Amazon_Dashboard.git'
+                // Clone your repository
+                git 'https://github.com/Chinmayee21d/Amazon_Dashboard.git'
             }
         }
 
-        stage('Set up Python Environment') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    def pythonBin = ".\\${VENV_DIR}\\Scripts"
-
-                    // Check python and pip versions
-                    bat 'python --version'
-                    bat 'pip --version'
-
-                    // Create virtual environment
-                    bat "python -m venv ${VENV_DIR}"
-
-                    // Verify venv creation
-                    bat "dir ${pythonBin}"  // Debugging: confirm venv created
-
-                    // Upgrade pip and install requirements in one line
-                    bat "${pythonBin}\\python.exe -m pip install --upgrade pip"
-                    bat "${pythonBin}\\python.exe -m pip install -r requirements.txt"
+                    // Build the Docker image
+                    sh 'docker build -t ${DOCKER_IMAGE} .'
                 }
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Docker Container') {
             steps {
                 script {
-                    def pythonBin = ".\\${VENV_DIR}\\Scripts"
-
-                    // Run pytest using python -m to ensure it works in all environments
-                    bat "${pythonBin}\\python.exe -m pytest tests --junitxml=pytest-report.xml"
+                    // Run the Docker container
+                    sh 'docker-compose up -d'
                 }
             }
         }
 
-        stage('Run Streamlit App (optional deploy step)') {
+        stage('Test') {
             steps {
-                echo 'Deployment logic here if needed (Heroku, EC2, etc.)'
-                // Example: bat '.\\venv\\Scripts\\streamlit run app.py'
+                // Run any tests if necessary
+                // e.g., curl localhost:8501 to ensure the app is up and running
+                sh 'curl --silent --fail http://localhost:8501'
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                script {
+                    // Stop and remove the container after use
+                    sh 'docker-compose down'
+                }
             }
         }
     }
 
     post {
         always {
-            // Publish test results to Jenkins UI
-            junit 'pytest-report.xml'
-        }
-        failure {
-            echo 'Build failed!'
-        }
-        success {
-            echo 'Build succeeded!'
+            cleanWs()  // Clean workspace after the build is finished
         }
     }
 }
