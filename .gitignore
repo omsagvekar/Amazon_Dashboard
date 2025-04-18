@@ -1,0 +1,40 @@
+# macOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+.env
+.venv/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# CSV or data files (optional, if sensitive or large)
+*.csv
+
+# Bytecode / compiled
+*.class
+*.o
+*.so
+*.exe
+
+# Git
+*.orig
+*.swp
