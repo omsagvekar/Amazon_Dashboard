@@ -14,11 +14,13 @@ pipeline {
 
         stage('Set up Python Environment') {
             steps {
-                sh 'python3 -m venv $VENV_DIR'
                 script {
+                    // Windows uses a different path for virtual environment and pip
                     def pythonBin = isUnix() ? './$VENV_DIR/bin' : '.\\$VENV_DIR\\Scripts'
-                    sh "${pythonBin}/pip install --upgrade pip"
-                    sh "${pythonBin}/pip install -r requirements.txt"
+                    // Use bat for Windows commands
+                    bat 'python -m venv $VENV_DIR'
+                    bat '.\\$VENV_DIR\\Scripts\\pip install --upgrade pip'
+                    bat '.\\$VENV_DIR\\Scripts\\pip install -r requirements.txt'
                 }
             }
         }
@@ -26,14 +28,14 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo 'No tests defined yet. Add pytest or other test runner here.'
-                // Example: sh './$VENV_DIR/bin/pytest tests'
+                // Example: bat '.\\$VENV_DIR\\Scripts\\pytest tests'
             }
         }
 
         stage('Run Streamlit App (optional deploy step)') {
             steps {
                 echo 'Deployment logic here if needed (Heroku, EC2, etc.)'
-                // Example: sh './$VENV_DIR/bin/streamlit run app.py'
+                // Example: bat '.\\$VENV_DIR\\Scripts\\streamlit run app.py'
             }
         }
     }
@@ -41,11 +43,9 @@ pipeline {
     post {
         failure {
             echo 'Build failed!'
-            // Additional failure handling (e.g., sending a notification)
         }
         success {
             echo 'Build succeeded!'
-            // Additional success handling (e.g., notifications or deployments)
         }
     }
 }
