@@ -8,15 +8,18 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Chinmayee21d/Amazon_Dashboard.git'
+                git branch: 'main', url: 'https://github.com/Chinmayee21d/Amazon_Dashboard.git'
             }
         }
 
         stage('Set up Python Environment') {
             steps {
                 sh 'python3 -m venv $VENV_DIR'
-                sh './$VENV_DIR/bin/pip install --upgrade pip'
-                sh './$VENV_DIR/bin/pip install -r requirements.txt'
+                script {
+                    def pythonBin = isUnix() ? './$VENV_DIR/bin' : '.\\$VENV_DIR\\Scripts'
+                    sh "${pythonBin}/pip install --upgrade pip"
+                    sh "${pythonBin}/pip install -r requirements.txt"
+                }
             }
         }
 
@@ -38,9 +41,11 @@ pipeline {
     post {
         failure {
             echo 'Build failed!'
+            // Additional failure handling (e.g., sending a notification)
         }
         success {
             echo 'Build succeeded!'
+            // Additional success handling (e.g., notifications or deployments)
         }
     }
 }
