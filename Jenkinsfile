@@ -6,10 +6,9 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Clone Repo') {
             steps {
-                // Clone your repository
-                git 'https://github.com/omsagvekar/Amazon_Dashboard.git'
+                git branch: 'main', url: 'https://github.com/omsagvekar/Amazon_Dashboard.git'
             }
         }
 
