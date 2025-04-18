@@ -15,35 +15,28 @@ pipeline {
         stage('Set up Python Environment') {
             steps {
                 script {
-                    // Debugging step to check environment
                     bat 'python --version'
                     bat 'pip --version'
 
-                    // Define the virtual environment binary location for Windows
-                    def pythonBin = isUnix() ? "./${VENV_DIR}/bin" : ".\\${VENV_DIR}\\Scripts"
+                    def pythonBin = ".\\${VENV_DIR}\\Scripts"
 
-                    // Create the virtual environment
                     bat "python -m venv ${VENV_DIR}"
-
-                    // Check if venv creation was successful
-                    bat "dir .\\${VENV_DIR}\\Scripts"  // List files in the Scripts folder to check if virtualenv created
-
-                    // Upgrade pip using the virtual environment's Python executable
-                    bat ".\\${VENV_DIR}\\Scripts\\python.exe -m pip install --upgrade pip"
-
-                    // Check pip version after upgrade
-                    bat ".\\${VENV_DIR}\\Scripts\\python.exe -m pip --version"
-
-                    // Install dependencies from requirements.txt using the virtual environment's pip
-                    bat ".\\${VENV_DIR}\\Scripts\\python.exe -m pip install -r requirements.txt"
+                    bat "dir ${pythonBin}"  // Confirm venv created
+                    bat "${pythonBin}\\python.exe -m pip install --upgrade pip"
+                    bat "${pythonBin}\\python.exe -m pip --version"
+                    bat "${pythonBin}\\python.exe -m pip install -r requirements.txt"
                 }
             }
         }
 
         stage('Run Tests') {
             steps {
-                echo 'No tests defined yet. Add pytest or other test runner here.'
-                // Example: bat '.\\${VENV_DIR}\\Scripts\\pytest tests'
+                script {
+                    def pythonBin = ".\\${VENV_DIR}\\Scripts"
+
+                    // Run pytest and generate test report
+                    bat "${pythonBin}\\pytest tests --junitxml=pytest-report.xml"
+                }
             }
         }
 
@@ -56,6 +49,10 @@ pipeline {
     }
 
     post {
+        always {
+            // Publish test results even if tests fail
+            junit 'pytest-report.xml'
+        }
         failure {
             echo 'Build failed!'
         }
